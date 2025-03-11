@@ -1,17 +1,26 @@
 from fastapi import FastAPI
+from .core.database import User, Session
 
-from api.routes.api import router as api_router
-from core.events import create_start_app_handler
-from core.config import API_PREFIX, DEBUG, PROJECT_NAME, VERSION
+app = FastAPI()
 
-
-def get_application() -> FastAPI:
-    application = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
-    application.include_router(api_router, prefix=API_PREFIX)
-    pre_load = False
-    if pre_load:
-        application.add_event_handler("startup", create_start_app_handler(application))
-    return application
-
-
-app = get_application()
+@app.get("/")
+def read_root():
+    session = Session()
+    users = session.query(User).all()
+    session.close()
+    
+    user_list = []
+    for user in users:
+        user_list.append({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone": user.phone,
+            "address": user.address,
+            "role": user.role,
+            "is_active": user.is_active
+        })
+    
+    return {"users": user_list}
