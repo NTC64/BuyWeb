@@ -32,21 +32,5 @@ def read_root():
     finally:
         db.close()
 
-@app.post("/users", response_model=dict)
-def create_user(user: UserCreate):
-    db = SessionLocal()
-    try:
-        new_user = User(
-            username=user.username,
-            email=user.email,
-            hashed_password=user.password,  # Should hash password before saving
-            is_active=True
-        )
-        db.add(new_user)
-        db.commit()
-        return {"message": "User created successfully"}
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Email already exists")
-    finally:
-        db.close()
+
+

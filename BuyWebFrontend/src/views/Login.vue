@@ -1,15 +1,31 @@
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 
-const handleLogin = () => {
+const handleLogin = async () => {
   // TODO: Implement login logic here
   console.log('Login attempt:', {
-    username: username.value,
+    email: email.value,
     password: password.value
   })
+  try {
+    const response = await axios.post('http://127.0.0.1:2002/api/v1/auth/login', {
+      email: email.value,
+      password: password.value
+    })
+    console.log('Login successful:', response.data)
+    console.log('Test:', response.data.access_token)
+    const test = await axios.get('http://127.0.0.1:2002/api/v1/auth/me', {
+      headers: {
+        Authorization: `Bearer ${response.data.access_token}`
+      }
+    })
+  } catch (error) {
+    console.error('Login failed:', error)
+  }
 }
 </script>
 
@@ -20,14 +36,14 @@ const handleLogin = () => {
       <h2>Login</h2>
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="email">Email</label>
           <input
-            type="text"
-            id="username"
-            v-model="username"
+            type="email"
+            id="email"
+            v-model="email"
             required
-            placeholder="Enter username"
-          >
+            placeholder="Enter email"
+          >   
         </div>
         <div class="form-group">
           <label for="password">Password</label>
