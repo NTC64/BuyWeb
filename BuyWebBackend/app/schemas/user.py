@@ -1,24 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, constr
 from typing import Optional
 from datetime import datetime
 
 class UserBase(BaseModel):
-    username: str
-    email: str
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
-    address: Optional[str] = None
+    email: EmailStr
+    username: constr(min_length=3, max_length=50)
 
 class UserCreate(UserBase):
-    password: str
+    password: constr(min_length=8)
+    confirm_password: str
 
 class UserResponse(UserBase):
     id: int
-    role: str
-    is_active: int
+    is_active: bool
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
-        from_attributes = True  # Cho phép chuyển đổi từ SQLAlchemy model
+        from_attributes = True
